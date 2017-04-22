@@ -55,6 +55,7 @@ public class CameraController : MonoBehaviour {
         } else if (Input.mousePosition.x <= Screen.width && Input.mousePosition.x > Screen.width - hBorder) {
             moved += new Vector2(((hBorder - (Screen.width - Input.mousePosition.x)) / hBorder) * 5.0f * Time.deltaTime, 0.0f);
         }
+        Debug.Log(Input.mousePosition.y);
         if (Input.mousePosition.y >= 0 && Input.mousePosition.y < vBorder) {
             moved -= new Vector2(0.0f, ((vBorder - Input.mousePosition.y) / vBorder) * 5.0f * Time.deltaTime);
         } else if (Input.mousePosition.y <= Screen.height && Input.mousePosition.y > Screen.height - vBorder) {
