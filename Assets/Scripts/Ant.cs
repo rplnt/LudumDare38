@@ -8,10 +8,10 @@ public class Ant {
     public bool homing = false;
     public float speed {
         get {
-            return 1.0f * (carrying?0.7f:1.0f);
+            return 1.0f * ((carrying == null)?1.0f:0.7f);
         }
     }
-    public bool carrying = false;
+    public string carrying = null;
     Vector2 offset;
 
     public Vector3 NextTargetPosition {

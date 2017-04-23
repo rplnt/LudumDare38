@@ -30,30 +30,42 @@ public class AntController : MonoBehaviour {
     List<Ant> ants;
     Dictionary<GameObject, Node> paths;
 
-    public Action<GameObject> dig;
+    public Action<Vector2> dig;
+    Nest nest;
 
 	// Use this for initialization
 	void Start () {
         ants = new List<Ant>();
         paths = new Dictionary<GameObject, Node>();
+        ProcessSprites();
+        nest = FindObjectOfType<Nest>();
 	}
 
     void ProcessSprites() {
         itemSprites = new Dictionary<string, List<Sprite>>();
         foreach(Sprite sprite in sprites) {
-            char[] suckit = { '_' };
-            string[] keys = sprite.name.Split(suckit, 2);
-            if (!itemSprites.ContainsKey(keys[0])) {
-                itemSprites[keys[0]] = new List<Sprite>();   
+            string key;
+            string[] keys = sprite.name.Split('_');
+            if (keys.Length == 2) {
+                key = keys[0];
+            } else {
+                key = keys[0] + "_" + keys[1];
             }
-            itemSprites[keys[0]].Add(sprite);
+            if (!itemSprites.ContainsKey(key)) {
+                itemSprites[key] = new List<Sprite>();   
+            }
+            itemSprites[key].Add(sprite);
         }
+
+        //foreach (string k in itemSprites.Keys) {
+        //    Debug.Log(k);
+        //}
     }
 
 
-    public void AddAnt(GameObject go, GameObject spawner) {
+    public void AddAnt(GameObject go, Transform spawner) {
         Ant larva = new Ant(go, defaultHealth * UnityEngine.Random.Range(0.9f, 1.1f));
-        Node spawnerNode = paths[spawner];
+        Node spawnerNode = paths[spawner.gameObject];
         if (spawnerNode == null) {
             Debug.LogError("Ant spawned from spawner with no path");
             return;
@@ -90,16 +102,18 @@ public class AntController : MonoBehaviour {
                     // reached end
                     if (ant.NextTarget.go.CompareTag("Head")) {
                         if (dig != null) {
-                            dig(ant.NextTarget.go);  // TODO paint dirt, move head
-                            PickUp(ant);
+                            dig(ant.NextTarget.go.transform.position);
                         }
+                        // move head
+                        ant.NextTarget.go.transform.Translate((ant.NextTarget.go.transform.position - ant.NextTarget.prev.go.transform.position).normalized * Level.digSpeed, Space.World);
+                        PickUp(ant);
                     }
                     ant.homing = true;
                     ant.SetTarget(ant.NextTarget.prev);
 
                 } else if (ant.homing && ant.NextTarget.prev == null) {
                     // home
-                    NestAnt(ant);
+                    nest.NestAnt(ant);
                     ants.RemoveAt(i);
                 } else if (ant.homing) {
                     // walk home
@@ -113,23 +127,27 @@ public class AntController : MonoBehaviour {
 	}
 
 
-    string[] itemTypes = { "dirt", "stick", "dirt", "stone", "dirt", "food" };
+    public void AddNodeToPath(GameObject to, GameObject from) {
+        Node target = new Node(to, null, null);
+        if (!paths.ContainsKey(from)) {
+            paths[from] = new Node(from, target, null);
+        }
+        target.prev = paths[from];
+    }
+
+
+    string[] itemTypes = { "", "dirt", "stick", "dirt", "stone", "dirt", "food" };
     void PickUp(Ant ant) {
         string key = itemTypes[UnityEngine.Random.Range(0, itemTypes.Length)];
+        if (key == "") return;
+
         List<Sprite> spriteList = itemSprites[key];
         SpriteRenderer sr = ant.go.transform.Find("Item").GetComponent<SpriteRenderer>();
         sr.sprite = spriteList[UnityEngine.Random.Range(0, spriteList.Count)];
         sr.enabled = true;
-        ant.carrying = true;
+        ant.carrying = key;
 
         return;
-    }
-
-
-    void NestAnt(Ant ant) {
-        Debug.Log("Nesting...");
-        ant.go.Recycle();
-        // TODO! ants.Remove(ant);
     }
 
 }

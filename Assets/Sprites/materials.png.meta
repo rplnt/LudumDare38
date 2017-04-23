@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 83607c8824a5c2a4b968397b5877e58d
-timeCreated: 1492889310
+timeCreated: 1492947268
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -28,6 +28,8 @@ TextureImporter:
     21300042: food_2
     21300044: food_3
     21300046: food_4
+    21300048: food
+    21300050: dirt
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -140,9 +142,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 93
-        y: 85
-        width: 35
-        height: 28
+        y: 82
+        width: 33
+        height: 33
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -230,10 +232,10 @@ TextureImporter:
       name: stones
       rect:
         serializedVersion: 2
-        x: 131
-        y: 89
-        width: 46
-        height: 37
+        x: 132
+        y: 84
+        width: 43
+        height: 43
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -418,6 +420,32 @@ TextureImporter:
         height: 23
       alignment: 9
       pivot: {x: 0.5000004, y: 0.3218223}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: food
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 0
+        width: 30
+        height: 30
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: dirt
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 1
+        width: 27
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0

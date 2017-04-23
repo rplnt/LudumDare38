@@ -29,7 +29,7 @@ public class CameraController : MonoBehaviour {
 
         cam.orthographicSize = defaultZoom;
 
-        GameObject dirt = GameObject.Find("Dirt");
+        GameObject dirt = GameObject.Find("Dirt Renderer");
         if (dirt != null) {
             bounds = dirt.GetComponent<SpriteRenderer>().bounds;
         }
