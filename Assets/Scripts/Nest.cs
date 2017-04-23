@@ -23,7 +23,7 @@ public class Nest : MonoBehaviour {
     Transform[] slots = new Transform[Level.maxLevel + 1];
     List<Transform> spawners = new List<Transform>();
 
-    Consumables items = new Consumables(10, 10, 5, 5);
+    Consumables items = new Consumables(10, 100, 50, 50);
 
     int[] levelMultipliers = { 1, 2, 4, 5, 8 };
 
@@ -32,8 +32,16 @@ public class Nest : MonoBehaviour {
     public System.Action<int> antNestedCountChanged;
     public System.Action<bool> enoughResourcesToUpgrade;
     public System.Action leveledUp;
+    public System.Action<bool> build;
 
     public int currentLevel = 0;
+
+    [Header("Objects")]
+    public LineRenderer nestedAntsBar;
+    public GameObject offsitePrefab;
+    Head offsite;
+
+    //float feromones;
 
     GameObject ground;
     AntController antControl;
@@ -46,6 +54,8 @@ public class Nest : MonoBehaviour {
         if (antControl == null) {
             Debug.LogError("Err: could not find controller");
         }
+
+        antNestedCountChanged += UpdateBar;
 
         ObjectPool.CreatePool(antPrefab, 50);
 
@@ -71,6 +81,36 @@ public class Nest : MonoBehaviour {
         if (antNestedCountChanged != null) {
             antNestedCountChanged(nestedCount);
         }
+    }
+
+    void UpdateBar(int count) {
+        if (nestedAntsBar == null) return;
+
+        float ratio = (float)count/Level.limits[currentLevel];
+        nestedAntsBar.SetPosition(1, new Vector3(-0.4f + 1.5f * ratio, 0.4f, -5.0f));
+    }
+
+    public float Attack(Transform attacked) {
+        if (attacked == transform) {
+            nestedCount -= 1;
+            antCount -= 1;
+            if (nestedCount <= 0) {
+                nestedAntsBar.enabled = false;
+                //GAME OVER
+            }
+
+            if (antCountChanged != null) {
+                antCountChanged(antCount);
+            }
+            if (antNestedCountChanged != null) {
+                antNestedCountChanged(nestedCount);
+            }
+
+            return 0.75f * nestedCount;
+        } else {
+            // offsite
+        }
+        return 0.0f;
     }
 
 
@@ -115,9 +155,7 @@ public class Nest : MonoBehaviour {
         PulseSlots();
     }
 
-
     public void LevelUp() {
-        Debug.Log("Leveling up...");
         if (currentLevel + 1 > Level.maxLevel) {
             Debug.LogError("OVERLEVELED!");
             return;
@@ -151,14 +189,6 @@ public class Nest : MonoBehaviour {
         }
     }
 
-    public void CreateSpawner(GameObject slot) {
-        slot.SetActive(false);
-        GameObject spawner = Instantiate(spawnPrefab, slot.transform.position, slot.transform.rotation, slot.transform.parent);
-    }
-
-    public void OpenSpawner(Transform t) {
-        spawners.Add(t);
-    }
 
     public void NestAnt(Ant ant) {
         items.Add(ant.carrying);
@@ -174,12 +204,51 @@ public class Nest : MonoBehaviour {
         }
     }
 
-    public void KillAnt(Ant ant) {
+    public bool NestAntOffsite(Ant ant, Transform location) {
+        OffsiteManager om = location.GetComponent<OffsiteManager>();
+        if (!om.NestAnt()) {
+            return false;
+        }
+        ant.go.Recycle();
+        return true;
+    }
+
+    public void KillFreeAnt(Ant ant) {
         ant.go.Recycle();
         antCount--;
         if (antCountChanged != null) {
             antCountChanged(antCount);
         }
+    }
+
+    public void CreateSpawner(GameObject slot) {
+        slot.SetActive(false);
+        GameObject spawner = Instantiate(spawnPrefab, slot.transform.position, slot.transform.rotation, slot.transform.parent);
+    }
+
+
+
+    
+    public void OpenSpawner(Transform t) {
+        spawners.Add(t);
+    }
+
+    
+    public void BuildOffsite(Head buildLocation) {
+        Time.timeScale = 0.0f;
+        offsite = buildLocation;
+        if (build != null) {
+            build(items.IsEnough(Level.costs[0]));
+        }
+    }
+
+    public void BuildFortress(bool build) {
+        if (build) {
+            Instantiate(offsitePrefab, offsite.transform.position, Quaternion.identity, transform);
+        }
+
+        offsite.SpawnNewHead();
+
     }
 
 }

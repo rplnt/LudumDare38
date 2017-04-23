@@ -8,6 +8,8 @@ TagManager:
   - Head
   - Slot
   - Item
+  - Nest
+  - Offsite
   layers:
   - Default
   - TransparentFX

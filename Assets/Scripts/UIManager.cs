@@ -17,18 +17,23 @@ public class UIManager : MonoBehaviour {
     public Text dirtUpgradeCost;
     public Text sticksUpgradeCost;
     public Text stonesUpgradeCost;
+    public Button button;
     public Text buttonText;
+
+    [Header("etc")]
+    public GameObject buildDialog;
 
     Nest nest;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
         nest = FindObjectOfType<Nest>();
         nest.resourcesUpdated += UpdateResources;
         nest.antCountChanged += UpdateAnts;
         nest.antNestedCountChanged += UpdateNested;
         nest.enoughResourcesToUpgrade += EnoughResources;
         nest.leveledUp += LevelUp;
+        nest.build += SetupBuildDialog;
 
         UpdateLevelCost();
 	}
@@ -37,6 +42,19 @@ public class UIManager : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    void SetupBuildDialog(bool canBuild) {
+        // position
+        buildDialog.transform.position = new Vector2(Mathf.Clamp(Input.mousePosition.x, 100, Screen.width - 100), Mathf.Clamp(Input.mousePosition.y, 100, Screen.width - 100));
+        Transform button = buildDialog.transform.FindChild("Yes");
+        Button buttonScript = button.GetComponent<Button>();
+        if (canBuild) {
+            buttonScript.interactable = true;
+        } else {
+            buttonScript.interactable = false;
+        }
+        buildDialog.SetActive(true);
+    }
 
 
     void UpdateAnts(int count) {
@@ -56,6 +74,7 @@ public class UIManager : MonoBehaviour {
 
     void EnoughResources(bool enough) {
         if (enough) {
+            button.interactable = true;
             buttonText.text = "LEVEL UP!";
             buttonText.color = Color.red;
         } else {
@@ -72,6 +91,7 @@ public class UIManager : MonoBehaviour {
     void LevelUp() {
         buttonText.text = "Level " + (nest.currentLevel + 1).ToString();
         buttonText.color = Color.black;
+        button.interactable = false;
         UpdateLevelCost();
     }
 }

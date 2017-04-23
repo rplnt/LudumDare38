@@ -116,8 +116,9 @@ public class AntController : MonoBehaviour {
                             dig(ant.NextTarget.go.transform.position);
                         }
                         // move head
-                        ant.NextTarget.go.transform.Translate((ant.NextTarget.go.transform.position - ant.NextTarget.prev.go.transform.position).normalized * Level.digSpeed, Space.World);
-                        AntDig(ant);
+                        if (AntDig(ant)) {
+                            ant.NextTarget.go.transform.Translate((ant.NextTarget.go.transform.position - ant.NextTarget.prev.go.transform.position).normalized * Level.digSpeed, Space.World);
+                        }
                     }
                     ant.homing = true;
                     ant.SetTarget(ant.NextTarget.prev);
@@ -164,7 +165,7 @@ public class AntController : MonoBehaviour {
 
 
     readonly string[] itemTypes = { "", "dirt", "stick", "dirt", "stone", "dirt", "food", "" };
-    void AntDig(Ant ant) {
+    bool AntDig(Ant ant) {
         string key = "";
 
         /* check if we are near something */
@@ -183,15 +184,15 @@ public class AntController : MonoBehaviour {
                 }
 
                 key = itemCache[hit.transform.gameObject].DigItem();
-            } else if (false) {
-                // different collision?
+            } else if (hit.transform.CompareTag("Offsite")) {
+                return !nest.NestAntOffsite(ant, hit.transform.parent);
             }
         } else {
             /* random dig from the ground */
             key = itemTypes[UnityEngine.Random.Range(0, itemTypes.Length)];
         }
         
-        if (key == "") return;
+        if (key == "") return true;
 
         List<Sprite> spriteList = itemSprites[key];
         SpriteRenderer sr = ant.go.transform.Find("Item").GetComponent<SpriteRenderer>();
@@ -199,7 +200,7 @@ public class AntController : MonoBehaviour {
         sr.enabled = true;
         ant.carrying = key;
 
-        return;
+        return true;
     }
 
 }

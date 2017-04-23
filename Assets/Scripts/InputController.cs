@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class InputController : MonoBehaviour {
 
+    Nest nest;
+
+    void Start() {
+        nest = FindObjectOfType<Nest>();
+    }
+
 	// Update is called once per frame
 	void Update () {
         if (Input.GetKeyDown(KeyCode.Escape)) {
@@ -22,9 +28,11 @@ public class InputController : MonoBehaviour {
                     }
                 } else if (hit.transform.CompareTag("Head")) {
                     Head head = hit.transform.gameObject.GetComponent<Head>();
-                    head.SpawnNewHead();
+
+                    nest.BuildOffsite(head);
                 }
             }
         }
 	}
+
 }

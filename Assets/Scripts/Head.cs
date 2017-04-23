@@ -11,6 +11,7 @@ public class Head : MonoBehaviour {
     AntController ac;
     Nest nest;
 
+    public GameObject offsitePrefab;
     public GameObject headPrefab;
 
     GameObject parent;
@@ -27,7 +28,7 @@ public class Head : MonoBehaviour {
 
         ps = transform.GetComponentInChildren<ParticleSystem>();
 
-        snooze = Time.time + 3.0f;
+        snooze = Time.time + 2.0f;
         Time.timeScale = 0.0f;
 
 
@@ -86,9 +87,6 @@ public class Head : MonoBehaviour {
         Destroy(sr);
         Destroy(ps);
         Destroy(this);
-        //this.enabled = false;
-
-        //ac.AddNodeToPath(headGo, gameObject);
     }
 
     void OnMouseEnter() {
@@ -99,6 +97,8 @@ public class Head : MonoBehaviour {
     void OnMouseExit() {
         StartCoroutine(HideSprite(sr.color.a, 0.0f, 0.2f));
     }
+
+
 
     IEnumerator ShowSprite(float startAlpha, float endAlpha, float duration) {
         Color c = sr.color;
