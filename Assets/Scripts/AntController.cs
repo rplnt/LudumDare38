@@ -33,12 +33,16 @@ public class AntController : MonoBehaviour {
     public Action<Vector2> dig;
     Nest nest;
 
+    Dictionary<GameObject, Item> itemCache;
+
 	// Use this for initialization
 	void Start () {
         ants = new List<Ant>();
         paths = new Dictionary<GameObject, Node>();
         ProcessSprites();
         nest = FindObjectOfType<Nest>();
+
+        itemCache = new Dictionary<GameObject, Item>();
 	}
 
     void ProcessSprites() {
@@ -65,6 +69,9 @@ public class AntController : MonoBehaviour {
 
     public void AddAnt(GameObject go, Transform spawner) {
         Ant larva = new Ant(go, defaultHealth * UnityEngine.Random.Range(0.9f, 1.1f));
+        if (!paths.ContainsKey(spawner.gameObject)) {
+            Debug.LogError(spawner.name);
+        }
         Node spawnerNode = paths[spawner.gameObject];
         if (spawnerNode == null) {
             Debug.LogError("Ant spawned from spawner with no path");
@@ -106,7 +113,7 @@ public class AntController : MonoBehaviour {
                         }
                         // move head
                         ant.NextTarget.go.transform.Translate((ant.NextTarget.go.transform.position - ant.NextTarget.prev.go.transform.position).normalized * Level.digSpeed, Space.World);
-                        PickUp(ant);
+                        AntDig(ant);
                     }
                     ant.homing = true;
                     ant.SetTarget(ant.NextTarget.prev);
@@ -136,9 +143,34 @@ public class AntController : MonoBehaviour {
     }
 
 
-    string[] itemTypes = { "", "dirt", "stick", "dirt", "stone", "dirt", "food" };
-    void PickUp(Ant ant) {
-        string key = itemTypes[UnityEngine.Random.Range(0, itemTypes.Length)];
+    readonly string[] itemTypes = { "", "dirt", "stick", "dirt", "stone", "dirt", "food", "" };
+    void AntDig(Ant ant) {
+        string key = "";
+
+        /* check if we are near something */
+        RaycastHit2D hit = Physics2D.Raycast(ant.go.transform.position, Vector3.forward, Mathf.Infinity, 1 << LayerMask.NameToLayer("AntsCare"));
+        if (hit.collider != null) {
+
+            /* pick up generic item */
+            if (hit.transform.CompareTag("Item")) {
+                if (!itemCache.ContainsKey(hit.transform.gameObject)) {
+                    Item itemObject = hit.transform.GetComponent<Item>();
+                    if (itemObject == null) {
+                        Debug.LogError("Found Item object without Item script");
+                    } else {
+                        itemCache[hit.collider.transform.gameObject] = itemObject;
+                    }
+                }
+
+                key = itemCache[hit.transform.gameObject].DigItem();
+            } else if (false) {
+                // different collision?
+            }
+        } else {
+            /* random dig from the ground */
+            key = itemTypes[UnityEngine.Random.Range(0, itemTypes.Length)];
+        }
+        
         if (key == "") return;
 
         List<Sprite> spriteList = itemSprites[key];

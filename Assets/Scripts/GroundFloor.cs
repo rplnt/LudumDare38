@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
+//[ExecuteInEditMode]
 public class GroundFloor : MonoBehaviour {
 
     public int width;
@@ -11,6 +11,9 @@ public class GroundFloor : MonoBehaviour {
     Bounds bounds;
     float worldSizeX;
     float worldSizeY;
+
+    public GameObject itemPrefab;
+    public int itemCount;
 
     public SpriteRenderer dirtSprite;
     public Color[] dirtColors;
@@ -30,7 +33,16 @@ public class GroundFloor : MonoBehaviour {
 
         ac = FindObjectOfType<AntController>();
         ac.dig += Dig;
+
+        SpawnItems(bounds);
 	}
+
+
+    void SpawnItems(Bounds bounds) {
+        for (int i = 0; i < itemCount; i++) {
+            Instantiate(itemPrefab, new Vector2(Random.Range(bounds.min.x + 1.0f, bounds.max.x - 3.0f), Random.Range(bounds.min.y + 1.0f, bounds.max.y - 1.0f)), Quaternion.Euler(0.0f, 0.0f, Random.Range(0.0f, 360.0f)), transform);
+        }
+    }
 
 
     void Dig(Vector2 position) {

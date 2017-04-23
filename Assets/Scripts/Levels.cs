@@ -52,7 +52,7 @@ public struct Consumables {
 
 public static class Level {
 
-    public static float digSpeed = 0.025f;
+    public static float digSpeed = 0.03f;
 
     public static int maxLevel = 4;
 

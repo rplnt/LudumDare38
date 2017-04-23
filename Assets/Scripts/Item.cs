@@ -6,7 +6,8 @@ public class Item : MonoBehaviour {
 
     public Sprite[] sprites;
 
-    public string itemType = "";
+    string itemType = "";
+    public int capacity;
 
     void Start() {
         Sprite sprite = sprites[Random.Range(0, sprites.Length)];
@@ -30,5 +31,13 @@ public class Item : MonoBehaviour {
 
         SpriteRenderer sr = this.GetComponent<SpriteRenderer>();
         sr.sprite = sprite;
+    }
+
+    public string DigItem() {
+        capacity--;
+        if (capacity <= 0) {
+            Destroy(gameObject);
+        }
+        return itemType;
     }
 }

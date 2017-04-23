@@ -8,16 +8,19 @@ public class InputController : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Escape)) {
             // TODO PAUSE MENU
         }
-
         if (Input.GetMouseButtonDown(0)) {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity);
+
             if (hit.collider != null) {
                 if (hit.transform.CompareTag("Slot")) {
+                    /* clicked on slot */
                     Nest nest = hit.transform.GetComponentInParent<Nest>();
                     if (nest != null) {
-                        nest.OpenSpawner(hit.transform.gameObject);
+                        nest.CreateSpawner(hit.transform.gameObject);
                     }
+                } else if (hit.transform.CompareTag("Head")) {
+
                 }
             }
         }

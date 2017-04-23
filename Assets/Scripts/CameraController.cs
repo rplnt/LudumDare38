@@ -49,17 +49,21 @@ public class CameraController : MonoBehaviour {
         /* keyboard */
         Vector2 moved = new Vector2(cam.transform.position.x + Time.deltaTime * Input.GetAxis("Horizontal") * movementScale, cam.transform.position.y + Time.deltaTime * Input.GetAxis("Vertical") * movementScale);
 
-        /* mouse */
-        if (Input.mousePosition.x >= 0 && Input.mousePosition.x < hBorder) {
-            moved -= new Vector2(((hBorder - Input.mousePosition.x) / hBorder) * 5.0f * Time.deltaTime, 0.0f);
-        } else if (Input.mousePosition.x <= Screen.width && Input.mousePosition.x > Screen.width - hBorder) {
-            moved += new Vector2(((hBorder - (Screen.width - Input.mousePosition.x)) / hBorder) * 5.0f * Time.deltaTime, 0.0f);
+        if (Input.mousePosition.x >= 0 && Input.mousePosition.x <= Screen.width && Input.mousePosition.y >= 0 && Input.mousePosition.y <= Screen.height) {
+            /* mouse */
+            if (Input.mousePosition.x >= 0 && Input.mousePosition.x < hBorder) {
+                moved -= new Vector2(((hBorder - Input.mousePosition.x) / hBorder) * 5.0f * Time.deltaTime, 0.0f);
+            } else if (Input.mousePosition.x <= Screen.width && Input.mousePosition.x > Screen.width - hBorder) {
+                moved += new Vector2(((hBorder - (Screen.width - Input.mousePosition.x)) / hBorder) * 5.0f * Time.deltaTime, 0.0f);
+            }
+            if (Input.mousePosition.y >= 0 && Input.mousePosition.y < vBorder) {
+                moved -= new Vector2(0.0f, ((vBorder - Input.mousePosition.y) / vBorder) * 5.0f * Time.deltaTime);
+            } else if (Input.mousePosition.y <= Screen.height && Input.mousePosition.y > Screen.height - vBorder) {
+                moved += new Vector2(0.0f, ((vBorder - (Screen.height - Input.mousePosition.y)) / vBorder) * 5.0f * Time.deltaTime);
+            }            
         }
-        if (Input.mousePosition.y >= 0 && Input.mousePosition.y < vBorder) {
-            moved -= new Vector2(0.0f, ((vBorder - Input.mousePosition.y) / vBorder) * 5.0f * Time.deltaTime);
-        } else if (Input.mousePosition.y <= Screen.height && Input.mousePosition.y > Screen.height - vBorder) {
-            moved += new Vector2(0.0f, ((vBorder - (Screen.height - Input.mousePosition.y)) / vBorder) * 5.0f * Time.deltaTime);
-        }
+
+
 
         cam.transform.position = new Vector3(
             Mathf.Clamp(moved.x, bounds.min.x + cam.orthographicSize * cam.aspect, bounds.max.x - cam.orthographicSize * cam.aspect),

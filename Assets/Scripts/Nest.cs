@@ -119,10 +119,13 @@ public class Nest : MonoBehaviour {
         }
     }
 
-    public void OpenSpawner(GameObject slot) {
+    public void CreateSpawner(GameObject slot) {
         slot.SetActive(false);
         GameObject spawner = Instantiate(spawnPrefab, slot.transform.position, slot.transform.rotation, slot.transform.parent);
-        spawners.Add(spawner.transform);
+    }
+
+    public void OpenSpawner(Transform t) {
+        spawners.Add(t);
     }
 
     public void NestAnt(Ant ant) {
