@@ -29,8 +29,11 @@ public class Nest : MonoBehaviour {
 
     public System.Action<Consumables> resourcesUpdated;
     public System.Action<int> antCountChanged;
+    public System.Action<int> antNestedCountChanged;
+    public System.Action<bool> enoughResourcesToUpgrade;
+    public System.Action leveledUp;
 
-    int currentLevel = 0;
+    public int currentLevel = 0;
 
     GameObject ground;
     AntController antControl;
@@ -65,6 +68,9 @@ public class Nest : MonoBehaviour {
         if (antCountChanged != null) {
             antCountChanged(antCount);
         }
+        if (antNestedCountChanged != null) {
+            antNestedCountChanged(nestedCount);
+        }
     }
 
 
@@ -82,6 +88,9 @@ public class Nest : MonoBehaviour {
             if (antCountChanged != null) {
                 antCountChanged(antCount);
             }
+            if (antNestedCountChanged != null) {
+                antNestedCountChanged(nestedCount);
+            }
         }
 
         // release ant
@@ -92,19 +101,42 @@ public class Nest : MonoBehaviour {
             antControl.AddAnt(larva, spawner);
             nestedCount--;
             lastRelease = Time.time;
+            if (antNestedCountChanged != null) {
+                antNestedCountChanged(nestedCount);
+            }
         }
 
         if (currentLevel < Level.maxLevel && items.IsEnough(Level.costs[currentLevel + 1])) {
-            // can upgrade
+            if (enoughResourcesToUpgrade != null) {
+                enoughResourcesToUpgrade(true);
+            }
         }
 
         PulseSlots();
     }
 
 
-    void Upgrade() {
+    public void LevelUp() {
+        Debug.Log("Leveling up...");
+        if (currentLevel + 1 > Level.maxLevel) {
+            Debug.LogError("OVERLEVELED!");
+            return;
+        }
+
+        if (!items.Consume(Level.costs[currentLevel + 1])) {
+            enoughResourcesToUpgrade(false);
+            return;
+        }
+
         currentLevel++;
-        transform.FindChild("Level " + currentLevel);
+        if (leveledUp != null) {
+            leveledUp();
+        }
+
+        Transform subnest = transform.FindChild("Level " + currentLevel);
+        if (subnest != null) {
+            subnest.gameObject.SetActive(true);
+        }
 
     }
 
@@ -137,7 +169,9 @@ public class Nest : MonoBehaviour {
             resourcesUpdated(items);
         }
 
-        //Debug.Log(resources);
+        if (antNestedCountChanged != null) {
+            antNestedCountChanged(nestedCount);
+        }
     }
 
     public void KillAnt(Ant ant) {

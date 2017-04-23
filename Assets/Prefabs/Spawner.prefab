@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4622049067334308}
   - component: {fileID: 212810309250448772}
-  - component: {fileID: 114305913558406650}
   m_Layer: 0
   m_Name: Spawner
   m_TagString: Spawner
@@ -118,19 +117,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.15
---- !u!114 &114305913558406650
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1192496539538484}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2831342954bb7b94fa1ad62fa92565b1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  direction: {x: 0, y: 0}
+  m_Radius: 0.2
 --- !u!114 &114542260524501962
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -142,6 +129,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39495e7f87dd2284fa266391e72e461d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headPrefab: {fileID: 1229017360652648, guid: fdd639b55438d20458d6491fcdcb4940, type: 2}
 --- !u!198 &198572915166072998
 ParticleSystem:
   m_ObjectHideFlags: 1

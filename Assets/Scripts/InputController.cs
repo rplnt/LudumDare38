@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class InputController : MonoBehaviour {
+
 	// Update is called once per frame
 	void Update () {
         if (Input.GetKeyDown(KeyCode.Escape)) {
@@ -20,7 +21,8 @@ public class InputController : MonoBehaviour {
                         nest.CreateSpawner(hit.transform.gameObject);
                     }
                 } else if (hit.transform.CompareTag("Head")) {
-
+                    Head head = hit.transform.gameObject.GetComponent<Head>();
+                    head.SpawnNewHead();
                 }
             }
         }

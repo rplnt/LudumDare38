@@ -24,7 +24,7 @@ public struct Consumables {
 
 
     public bool IsEnough(Consumables cost) {
-        return this.food > cost.food && this.dirt > cost.dirt && this.sticks > cost.sticks && this.stones > cost.stones;
+        return this.food >= cost.food && this.dirt >= cost.dirt && this.sticks >= cost.sticks && this.stones >= cost.stones;
     }
 
     public bool Consume(Consumables cost) {
@@ -38,7 +38,9 @@ public struct Consumables {
     }
 
     public void Add(string item) {
-        switch (item) {
+        if (item == null) return;
+        string[] prefix = item.Split('_');
+        switch (prefix[0]) {
             case "food": food += 1; break;
             case "dirt": dirt += 1; break;
             case "stick": sticks += 1; break;
@@ -52,28 +54,30 @@ public struct Consumables {
 
 public static class Level {
 
-    public static float digSpeed = 0.03f;
+    public static float digSpeed = 0.04f;
 
-    public static int maxLevel = 4;
+    public static int maxLevel = 6;
 
     public static readonly Consumables[] costs = {
-        new Consumables(0, 10, 5, 5),
-        new Consumables(0, 1, 2, 3),
-        new Consumables(0, 1, 2, 3),
-        new Consumables(0, 1, 2, 3),
-        new Consumables(0, 1, 2, 3)
+        new Consumables(0, 30, 20, 50),
+        new Consumables(0, 50, 15, 10),
+        new Consumables(0, 90, 30, 20),
+        new Consumables(0, 150, 50, 30),
+        new Consumables(0, 250, 90, 50),
+        new Consumables(0, 400, 120, 100),
+        new Consumables(0, 800, 150, 120)
     };
 
     public static readonly int[] limits = {
-        20, 50, 80, 120, 170
+        20, 50, 80, 120, 170, 200, 250
     };
 
     public static readonly float[] releaseDelay = {
-        0.7f, 0.5f, 0.4f, 0.2f, 0.1f
+        0.6f, 0.3f, 0.15f, 0.1f, 0.05f, 0.03f, 0.02f
     };
 
     public static readonly float[] birthDelay = {
-        3.5f, 3.0f, 2.0f, 1.0f, 0.8f
+        3.5f, 3.0f, 2.0f, 1.0f, 0.5f, 0.3f, 0.02f
     };
 
 

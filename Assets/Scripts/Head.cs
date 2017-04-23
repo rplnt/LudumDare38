@@ -11,6 +11,8 @@ public class Head : MonoBehaviour {
     AntController ac;
     Nest nest;
 
+    public GameObject headPrefab;
+
     GameObject parent;
 
     float snooze;
@@ -25,10 +27,9 @@ public class Head : MonoBehaviour {
 
         ps = transform.GetComponentInChildren<ParticleSystem>();
 
-        parent = transform.parent.gameObject; 
-
         snooze = Time.time + 3.0f;
         Time.timeScale = 0.0f;
+
 
         SetupLine();
     }
@@ -59,9 +60,6 @@ public class Head : MonoBehaviour {
             Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             pos.z = transform.position.z - 1;
             
-            //if ((line.GetPosition(0) - pos).magnitude > 1) {
-            //    // TODO limit line length and angle(?)
-            //}
             line.SetPosition(1, pos);
 
             if (Input.GetMouseButtonDown(0)) {
@@ -69,19 +67,28 @@ public class Head : MonoBehaviour {
                 line.enabled = false;
 
                 // move head to direction, set it as target
-                transform.position = (Vector2)(transform.position + 0.2f * (pos - transform.position).normalized);
+                transform.position = (Vector2)(transform.position + 0.1f * (pos - transform.position).normalized);
 
                 // TODO
-                ac.AddNodeToPath(gameObject, parent);
+                ac.AddNodeToPath(gameObject, transform.parent.gameObject);
 
                 /* first head, notify nest */
-                Spawner s = parent.GetComponent<Spawner>();
-                if (s != null) {
-                    s.Open();
+                if (transform.parent.CompareTag("Spawner")) {
+                    nest.OpenSpawner(transform.parent);
                 }
 
                 Time.timeScale = 1.0f;
             }
+    }
+
+    public void SpawnNewHead() {
+        GameObject headGo = Instantiate(headPrefab, transform.position, Quaternion.identity, transform);
+        Destroy(sr);
+        Destroy(ps);
+        Destroy(this);
+        //this.enabled = false;
+
+        //ac.AddNodeToPath(headGo, gameObject);
     }
 
     void OnMouseEnter() {

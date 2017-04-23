@@ -40,7 +40,7 @@ public class GroundFloor : MonoBehaviour {
 
     void SpawnItems(Bounds bounds) {
         for (int i = 0; i < itemCount; i++) {
-            Instantiate(itemPrefab, new Vector2(Random.Range(bounds.min.x + 1.0f, bounds.max.x - 3.0f), Random.Range(bounds.min.y + 1.0f, bounds.max.y - 1.0f)), Quaternion.Euler(0.0f, 0.0f, Random.Range(0.0f, 360.0f)), transform);
+            Instantiate(itemPrefab, new Vector2(Random.Range(bounds.min.x + 1.0f, bounds.max.x - 2.0f), Random.Range(bounds.min.y + 1.0f, bounds.max.y - 1.0f)), Quaternion.Euler(0.0f, 0.0f, Random.Range(0.0f, 360.0f)), transform);
         }
     }
 
@@ -56,7 +56,7 @@ public class GroundFloor : MonoBehaviour {
         for (int b = -patchSize/2; b < patchSize/2; b++) {
             for (int a = -patchSize/2; a < patchSize/2; a++) {
                 Color pixel = dirt.GetPixel(x + a, y + b);
-                float dimm = 1.05f - Mathf.Clamp(((Mathf.Abs(a) + Mathf.Abs(b) - 1)/(patchSize * 1.0f))/10.0f, 0.0f, 0.05f);
+                float dimm = 1.07f - Mathf.Clamp(((Mathf.Abs(a) + Mathf.Abs(b) - 1)/(patchSize * 1.0f))/10.0f, 0.0f, 0.07f);
                 dirt.SetPixel(x + a, y + b, new Color(pixel.r * dimm, pixel.g * dimm, pixel.b * dimm));
             }
             

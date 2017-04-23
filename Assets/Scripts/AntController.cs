@@ -13,6 +13,10 @@ public class Node {
     public GameObject go;
     public Node next;
     public Node prev;
+
+    public override string ToString() {
+        return base.ToString() + " " + go.name + " prev: " + (prev==null) + " next: " + (next==null);
+    }
 }
 
 
@@ -135,11 +139,27 @@ public class AntController : MonoBehaviour {
 
 
     public void AddNodeToPath(GameObject to, GameObject from) {
-        Node target = new Node(to, null, null);
+        Node target;
+        if (paths.ContainsKey(to)) {
+            target = paths[to];
+        } else {
+            target = new Node(to, null, null);
+            paths[to] = target;
+        }
+        
         if (!paths.ContainsKey(from)) {
             paths[from] = new Node(from, target, null);
+        } else {
+            paths[from].next = target;
         }
+
         target.prev = paths[from];
+
+        if (dig != null) {
+            dig(from.transform.position);
+            dig(from.transform.position);
+        }
+
     }
 
 
