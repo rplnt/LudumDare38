@@ -8,19 +8,20 @@ public class OffsiteManager : MonoBehaviour {
     public System.Action NestDestroyed;
     Nest nest;
 
-    public int antCount;
+    public int nestedAntCount;
 
     void Start() {
+        //Debug.Log("OffsiteManager:Start");
         UpdateHealthBar();
         nest = FindObjectOfType<Nest>();
     }
 
     public bool NestAnt() {
-        if (antCount >= Level.limits[0]) {
+        if (nestedAntCount >= Level.limits[0]) {
             return false;
         }
 
-        antCount++;
+        nestedAntCount++;
         UpdateHealthBar();
         return true;
     }
@@ -28,23 +29,27 @@ public class OffsiteManager : MonoBehaviour {
     void UpdateHealthBar() {
         if (healthBar == null) return;
 
-        float ratio = (float)antCount / Level.limits[0];
+        float ratio = (float)nestedAntCount / Level.limits[0];
         healthBar.SetPosition(1, new Vector3(-0.5f + ratio, 0.35f, -4.0f));
     }
 
 
-    public float Attack() {
-        antCount--;
-        nest.KilledOffsiteAnt();
-        if (antCount <= 0) {
+    public float AttackOffsite(int damage) {
+        damage = Mathf.Min(damage * 2, nestedAntCount);
+
+        nestedAntCount = nestedAntCount - damage;
+        nest.KilledOffsiteAnts(damage);
+        
+        if (nestedAntCount <= 0) {
             if (NestDestroyed != null) {
                 NestDestroyed();
             }
 
             Destroy(gameObject);
-            return -1.0f;
+            return 1f;
         }
         UpdateHealthBar();
-        return Mathf.Max(0.5f * antCount, 0.0f);
+        //Debug.Log(nestedAntCount * 0.75f);
+        return Mathf.Max(nestedAntCount * 0.75f, 0.0f);
     }
 }

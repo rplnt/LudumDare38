@@ -127,6 +127,12 @@ public class UIManager : MonoBehaviour {
     }
 
     void UpdateLevelCost() {
+        if (nest.currentLevel + 1 > Level.maxLevel) {
+            dirtUpgradeCost.text = "-";
+            sticksUpgradeCost.text = "-";
+            stonesUpgradeCost.text = "-";
+            return;
+        }
         dirtUpgradeCost.text = Level.costs[nest.currentLevel + 1].dirt.ToString();
         sticksUpgradeCost.text = Level.costs[nest.currentLevel + 1].sticks.ToString();
         stonesUpgradeCost.text = Level.costs[nest.currentLevel + 1].stones.ToString();

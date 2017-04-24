@@ -41,7 +41,7 @@ public struct Consumables {
         if (item == null) return;
         string[] prefix = item.Split('_');
         switch (prefix[0]) {
-            case "food": food += 1; break;
+            case "food": food += 2; break;
             case "dirt": dirt += 1; break;
             case "stick": sticks += 1; break;
             case "stone": stones += 1; break;
@@ -54,18 +54,18 @@ public struct Consumables {
 
 public static class Level {
 
-    public static float digSpeed = 0.04f;
+    public static float digSpeed = 0.05f;
 
     public static int maxLevel = 6;
 
     public static readonly Consumables[] costs = {
-        new Consumables(0, 15, 5, 10),
-        new Consumables(0, 50, 15, 10),
-        new Consumables(0, 90, 30, 20),
-        new Consumables(0, 150, 50, 30),
-        new Consumables(0, 250, 90, 50),
-        new Consumables(0, 400, 120, 80),
-        new Consumables(0, 800, 150, 100)
+        new Consumables(0, 5, 5, 15),
+        new Consumables(0, 40, 12, 10),
+        new Consumables(0, 60, 25, 15),
+        new Consumables(0, 100, 45, 25),
+        new Consumables(0, 160, 75, 40),
+        new Consumables(0, 280, 110, 60),
+        new Consumables(0, 400, 160, 90)
     };
 
     public static readonly int[] limits = {
@@ -73,11 +73,11 @@ public static class Level {
     };
 
     public static readonly float[] releaseDelay = {
-        0.6f, 0.3f, 0.15f, 0.1f, 0.05f, 0.03f, 0.02f
+        0.6f, 0.4f, 0.3f, 0.2f, 0.1f, 0.05f, 0.02f
     };
 
     public static readonly float[] birthDelay = {
-        3.5f, 3.0f, 2.0f, 1.0f, 0.5f, 0.3f, 0.02f
+        2.5f, 2.0f, 1.5f, 1.0f, 0.5f, 0.3f, 0.1f
     };
 
 

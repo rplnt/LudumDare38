@@ -8,7 +8,7 @@ public class GroundFloor : MonoBehaviour {
     public int width;
     public int height;
     Texture2D dirt;
-    public Bounds bounds;
+    public Bounds gameBounds;
     float worldSizeX;
     float worldSizeY;
 
@@ -26,28 +26,28 @@ public class GroundFloor : MonoBehaviour {
 	void Start () {
         PaintDirt();
 
-        bounds = dirtSprite.bounds;
-        worldSizeX = bounds.max.x - bounds.min.x;
-        worldSizeY = bounds.max.y - bounds.min.y;
+        gameBounds = new Bounds(new Vector3(dirtSprite.bounds.center.x, dirtSprite.bounds.center.y - 0.5f, dirtSprite.bounds.center.z), new Vector3(dirtSprite.bounds.size.x - 1.0f, dirtSprite.bounds.size.y - 1.5f, 1.0f));
+        worldSizeX = dirtSprite.bounds.max.x - dirtSprite.bounds.min.x;
+        worldSizeY = dirtSprite.bounds.max.y - dirtSprite.bounds.min.y;
      
 
         ac = FindObjectOfType<AntController>();
         ac.dig += Dig;
 
-        SpawnItems(bounds);
+        SpawnItems(gameBounds);
 	}
 
 
     void SpawnItems(Bounds bounds) {
         for (int i = 0; i < itemCount; i++) {
-            Instantiate(itemPrefab, new Vector2(Random.Range(bounds.min.x + 1.0f, bounds.max.x - 2.0f), Random.Range(bounds.min.y + 1.0f, bounds.max.y - 1.0f)), Quaternion.Euler(0.0f, 0.0f, Random.Range(0.0f, 360.0f)), transform);
+            Instantiate(itemPrefab, new Vector2(Random.Range(bounds.min.x, bounds.max.x), Random.Range(bounds.min.y, bounds.max.y)), Quaternion.Euler(0.0f, 0.0f, Random.Range(0.0f, 360.0f)), transform);
         }
     }
 
 
     void Dig(Vector2 position) {
-        int x = Mathf.RoundToInt(width * ((position.x - bounds.min.x) / worldSizeX));
-        int y = Mathf.RoundToInt(height * ((position.y - bounds.min.y) / worldSizeY));
+        int x = Mathf.RoundToInt(width * ((position.x - dirtSprite.bounds.min.x) / worldSizeX));
+        int y = Mathf.RoundToInt(height * ((position.y - dirtSprite.bounds.min.y) / worldSizeY));
 
         if (x - patchSize < 0 || x + patchSize > dirt.width || y - patchSize < 0 || y + patchSize > height) {
             return;

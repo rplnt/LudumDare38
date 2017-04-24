@@ -11,12 +11,14 @@ public class Head : MonoBehaviour {
     AntController ac;
     Nest nest;
 
+    //public bool clicked = false;
+
     public GameObject offsitePrefab;
     public GameObject headPrefab;
 
     GameObject parent;
 
-    float snooze;
+    public float snooze;
 
     void Start() {
         ac = FindObjectOfType<AntController>();
@@ -64,6 +66,7 @@ public class Head : MonoBehaviour {
             line.SetPosition(1, pos);
 
             if (Input.GetMouseButtonDown(0)) {
+                //Debug.Log("DirectHead click (closing path)");
                 displayLine = false;
                 line.enabled = false;
 
@@ -85,7 +88,9 @@ public class Head : MonoBehaviour {
     }
 
     public void SpawnNewHead() {
-        GameObject headGo = Instantiate(headPrefab, transform.position, Quaternion.identity, transform);
+        //Debug.Log("SpawnNewHead");
+        Instantiate(headPrefab, transform.position, Quaternion.identity, transform);
+        gameObject.tag = "Untagged";
         Destroy(sr);
         Destroy(ps);
         Destroy(this);

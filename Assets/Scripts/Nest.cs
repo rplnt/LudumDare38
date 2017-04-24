@@ -8,6 +8,7 @@ public class Nest : MonoBehaviour {
     [Header("Ants")]
     public int antCount;
     public int nestedCount;
+    public int nestedOffsiteCount;
 
     [Header("Ant Properties")]
     public GameObject antPrefab;
@@ -26,9 +27,7 @@ public class Nest : MonoBehaviour {
     Transform[] slots = new Transform[Level.maxLevel + 1];
     List<Transform> spawners = new List<Transform>();
 
-    Consumables items = new Consumables(20, 10, 5, 5);
-
-    int[] levelMultipliers = { 1, 2, 4, 5, 8 };
+    Consumables items = new Consumables(20, 15, 5, 5);
 
     public System.Action<Consumables> resourcesUpdated;
     public System.Action<int> antCountChanged;
@@ -55,6 +54,7 @@ public class Nest : MonoBehaviour {
     AntController antControl;
 
     void Start() {
+        antCount = Level.limits[0];
         nestedCount = antCount;
         lastBirth = Time.time;
         lastRelease = Time.time;
@@ -89,12 +89,13 @@ public class Nest : MonoBehaviour {
         if (antNestedCountChanged != null) {
             antNestedCountChanged(nestedCount);
         }
+
     }
 
     void UpdateBar(int count) {
         if (nestedAntsBar == null) return;
 
-        float ratio = (float)count/Level.limits[currentLevel];
+        float ratio = Mathf.Clamp01((float)count/Level.limits[currentLevel]);
         nestedAntsBar.SetPosition(1, new Vector3(-0.4f + 1.5f * ratio, 0.4f, -5.0f));
     }
 
@@ -102,8 +103,16 @@ public class Nest : MonoBehaviour {
         //items.dirt -= 2;
     }
 
-    public float Attack() {
-        nestedCount -= 1;
+    public float Attack(int damage) {
+        if (Random.Range(0.0f, 1.0f) < 0.1f) {
+            // critical TODO
+            damage *= 2;
+        }
+
+        damage = Mathf.Min(damage, nestedCount);
+
+        antCount -= damage;
+        nestedCount -= damage;
         if (nestedCount <= 0) {
             Debug.Log("GAME OVER");
             /* GAME OVER*/
@@ -116,7 +125,6 @@ public class Nest : MonoBehaviour {
             return 0.0f;
         }
 
-        antCount -= 1;
         lastAttack = Time.time;
 
         if (antCountChanged != null) {
@@ -126,17 +134,20 @@ public class Nest : MonoBehaviour {
             antNestedCountChanged(nestedCount);
         }
 
-        return Mathf.Max(0.75f * nestedCount, 0.0f);
+        float effectivity = 1.0f - (float)nestedCount/Level.limits[currentLevel];
+        float attack = 0.4f * nestedCount + effectivity * 0.6f * nestedCount;
+        return Mathf.Max(attack, 0.0f);
     }
 
 
     void Update() {
         // create ant
-        if (nestedCount < Level.limits[currentLevel] && lastBirth + Level.birthDelay[currentLevel] < Time.time && items.food >= antFoodCost) {
+        if (lastBirth + Level.birthDelay[currentLevel] < Time.time && nestedCount < Level.limits[currentLevel] && items.food >= antFoodCost) {
             items.food -= antFoodCost;
             nestedCount++;
             antCount++;
             lastBirth = Time.time;
+            totalAnts++;
 
             if (resourcesUpdated != null) {
                 resourcesUpdated(items);
@@ -147,20 +158,11 @@ public class Nest : MonoBehaviour {
             if (antNestedCountChanged != null) {
                 antNestedCountChanged(nestedCount);
             }
-            totalAnts++;
         }
 
         // release ant
-        if (nestedCount > Level.limits[currentLevel] / 2 && lastRelease + Level.releaseDelay[currentLevel] < Time.time && spawners.Count > 0 && Time.time > lastAttack + attackBLockade) {
-            Transform spawner = spawners[Random.Range(0, spawners.Count)];
-            GameObject larva = antPrefab.Spawn(ground.transform, spawner.position, Quaternion.identity);
-            larva.transform.Find("Item").GetComponent<SpriteRenderer>().enabled = false;
-            antControl.AddAnt(larva, spawner);
-            nestedCount--;
-            lastRelease = Time.time;
-            if (antNestedCountChanged != null) {
-                antNestedCountChanged(nestedCount);
-            }
+        if (lastRelease + Level.releaseDelay[currentLevel] < Time.time && spawners.Count > 0 && Time.time > lastAttack + attackBLockade) {
+            ReleaseAnt(spawners[Random.Range(0, spawners.Count)]);
         }
 
         if (currentLevel < Level.maxLevel && items.IsEnough(Level.costs[currentLevel + 1])) {
@@ -170,6 +172,23 @@ public class Nest : MonoBehaviour {
         }
 
         PulseSlots();
+    }
+
+
+    public void ReleaseAnt(Transform spawner) {
+        if (spawner == null) {
+            Debug.LogError("Failed release");
+            return;
+        }
+        if (nestedCount < 1) return;
+        GameObject larva = antPrefab.Spawn(ground.transform, spawner.position, Quaternion.identity);
+        larva.transform.Find("Item").GetComponent<SpriteRenderer>().enabled = false;
+        antControl.AddAnt(larva, spawner);
+        nestedCount--;
+        lastRelease = Time.time;
+        if (antNestedCountChanged != null) {
+            antNestedCountChanged(nestedCount);
+        }
     }
 
     public void LevelUp() {
@@ -209,8 +228,16 @@ public class Nest : MonoBehaviour {
 
     public void NestAnt(Ant ant) {
         items.Add(ant.carrying);
-        nestedCount++;
         ant.go.Recycle();
+        nestedCount++;
+
+        if (nestedCount > Level.limits[currentLevel]) {
+            if (ant.NextTarget != null) {
+                ReleaseAnt(ant.NextTarget.go.transform);
+            } else {
+                Debug.LogError("Lost ant at nest?");
+            }
+        }
 
         if (resourcesUpdated != null) {
             resourcesUpdated(items);
@@ -226,40 +253,44 @@ public class Nest : MonoBehaviour {
         if (!om.NestAnt()) {
             return false;
         }
+        nestedOffsiteCount++;
         ant.go.Recycle();
         return true;
     }
 
-    //public void KillFreeAnt(Ant ant) {
-    //    ant.go.Recycle();
-    //    antCount--;
-    //    if (antCountChanged != null) {
-    //        antCountChanged(antCount);
-    //    }
-    //}
 
-    public void KilledOffsiteAnt() {
-        antCount--;
+    public void KilledOffsiteAnts(int count=1) {
+        antCount -= count;
+        nestedOffsiteCount -= count;
 
         if (antCountChanged != null) {
             antCountChanged(antCount);
         }
     }
 
+
     public void CreateSpawner(GameObject slot) {
         slot.SetActive(false);
-        GameObject spawner = Instantiate(spawnPrefab, slot.transform.position, slot.transform.rotation, slot.transform.parent);
+        Instantiate(spawnPrefab, slot.transform.position, slot.transform.rotation, slot.transform.parent);
     }
 
 
+    public void OpenSpawner(Transform spawner) {
+        spawners.Add(spawner);
+    }
 
-    
-    public void OpenSpawner(Transform t) {
-        spawners.Add(t);
+    public void CloseSpawner(Transform spawner) {
+        spawners.Remove(spawner);
     }
 
     
     public void BuildOffsite(Head buildLocation) {
+        //Debug.Log("Nest:BuildOffsite");
+        if (offsite != null) return;
+        if (buildLocation == null) {
+            Debug.LogError("Nest:BuildOffsite: null head");
+            return;
+        }
         Time.timeScale = 0.0f;
         offsite = buildLocation;
         if (build != null) {
@@ -267,21 +298,34 @@ public class Nest : MonoBehaviour {
         }
     }
 
-    public void BuildFortress(bool build) {
-        if (build) {
+    public void Feed(int count) {
+        items.food += count;
+        if (resourcesUpdated != null) {
+            resourcesUpdated(items);
+        }
+    }
+
+    public void BuildFortress(bool doBuild) {
+        //Debug.Log("Nest:BuildFortress:doBuild" + doBuild);
+        if (doBuild) {
             if (items.Consume(Level.costs[0])) {
                 Instantiate(offsitePrefab, offsite.transform.position, Quaternion.identity, transform);
                 totalNests++;
             } else {
+                offsite = null;
                 return;
             }
             if (newNest != null) {
                 newNest();
             }
         }
+        if (offsite != null) {
+            offsite.SpawnNewHead();
+        } else {
+            Debug.LogError("Could not find offsite, building? " + doBuild);
+        }
 
-        offsite.SpawnNewHead();
-
+        offsite = null;
     }
 
 }

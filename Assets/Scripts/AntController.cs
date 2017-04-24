@@ -63,10 +63,6 @@ public class AntController : MonoBehaviour {
             }
             itemSprites[key].Add(sprite);
         }
-
-        //foreach (string k in itemSprites.Keys) {
-        //    Debug.Log(k);
-        //}
     }
 
 
@@ -87,6 +83,8 @@ public class AntController : MonoBehaviour {
 
 	void Update () {
         /* Move ants */
+        //Debug.Log(nest.antCount + " = " + nest.nestedCount + " + " + ants.Count);
+        Debug.Assert(nest.antCount == nest.nestedCount + nest.nestedOffsiteCount + ants.Count);
         //foreach (Ant ant in ants) {
         for (int i = ants.Count - 1; i >= 0; i--) {
             Ant ant = ants[i];
@@ -111,16 +109,13 @@ public class AntController : MonoBehaviour {
                 if (!ant.homing && ant.NextTarget.next == null) {
                     // reached end
                     if (ant.NextTarget.go.CompareTag("Head")) {
-                        if (ground.bounds.Contains(ant.NextTargetPosition)) {
+                        if (ground.gameBounds.Contains(ant.NextTargetPosition)) {
                             // move head
                             if (AntDig(ant)) {
                                 ant.NextTarget.go.transform.Translate((ant.NextTarget.go.transform.position - ant.NextTarget.prev.go.transform.position).normalized * Level.digSpeed, Space.World);
                                 if (dig != null) {
                                     dig(ant.NextTarget.go.transform.position);
                                 }
-                            }
-                            if (ant.remove) {
-                                ants.RemoveAt(i);
                             }
                         }
                     }
@@ -136,7 +131,12 @@ public class AntController : MonoBehaviour {
                     ant.SetTarget(ant.NextTarget.prev);
                 } else {
                     // walk somewhere
+                    TryNestAnt(ant);
                     ant.SetTarget(ant.NextTarget.next);
+                }
+
+                if (ant.remove) {
+                    ants.RemoveAt(i);
                 }
             }
         }
@@ -168,7 +168,22 @@ public class AntController : MonoBehaviour {
     }
 
 
-    readonly string[] itemTypes = { "", "dirt", "stick", "dirt", "stone", "dirt", "food", "" };
+    bool TryNestAnt(Ant ant) {
+        RaycastHit2D hit = Physics2D.Raycast(ant.go.transform.position, Vector3.forward, Mathf.Infinity, 1 << LayerMask.NameToLayer("AntsCare"));
+        if (hit.collider != null) {
+            if (hit.transform.CompareTag("Offsite")) {
+                if (nest.NestAntOffsite(ant, hit.transform)) {
+                    ant.remove = true;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    readonly string[] itemTypes = { "", "dirt", "stick", "dirt", "stone", "food" };
     bool AntDig(Ant ant) {
         string key = "";
 

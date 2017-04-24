@@ -6,9 +6,10 @@ public class BugAI : MonoBehaviour {
 
     public float speed;
     public float rotateSpeed;
-    public float maxHealthBase;
-    float currentHealth;
+    public float healthBase;
+    public float currentHealth;
     public float attackDelay;
+    public float damage;
     float lastAttack = 0.0f;
 
     bool dead = false;
@@ -31,25 +32,39 @@ public class BugAI : MonoBehaviour {
     
 	// Use this for initialization
 	void Start () {
-        currentHealth = maxHealthBase;
         UpdateTargets();
         graphics = transform.FindChild("Graphics");
         sr = graphics.GetComponent<SpriteRenderer>();
         sr.color = colors[Random.Range(0, colors.Length)];
         ns = FindObjectOfType<Nest>();
         ns.newNest += UpdateTargets;
+
+        currentHealth = healthBase + Random.Range(0.0f, 2.0f * ns.killedBugs);
 	}
+
+    IEnumerator Dead(int feedNest, float delay) {
+        float elapsed = 0.0f;
+        int fed = 0;
+
+        Color c = sr.color;
+
+        while (elapsed < delay) {
+            elapsed += Time.deltaTime;
+            if (fed < Mathf.Lerp(0, feedNest, elapsed / delay)) {
+                ns.Feed(1);
+                fed++;
+            }
+            c.a = Mathf.Lerp(1.0f, 0.0f, elapsed / delay);
+            sr.color = c;
+            yield return null;
+        }
+
+        Destroy(gameObject);
+    }
 	
 	// Update is called once per frame
 	void Update () {
         if (dead) {
-            Color c = sr.color;
-            c.a -= 0.025f * Time.deltaTime;
-            if (c.a < 0.1f) {
-                Destroy(gameObject);
-            }
-            sr.color = c;
-
             return;
         }
 
@@ -61,15 +76,17 @@ public class BugAI : MonoBehaviour {
 
         Vector3 targetVector = currentTarget.transform.position - transform.position;
 
-        if (targetVector.magnitude < 0.1f) {
+        if (targetVector.magnitude < 0.25f) {
             // ATTACK
             if (Time.time > lastAttack + attackDelay) {
                 lastAttack = Time.time;
                 if (currentTarget.transform.parent.CompareTag("Offsite")) {
+                    //Debug.Log(gameObject.name + " attacking offsite nest from " + gameObject.transform.position);
                     OffsiteManager om = currentTarget.transform.parent.GetComponent<OffsiteManager>();
-                    currentHealth -= om.Attack();
+                    currentHealth -= om.AttackOffsite(Mathf.RoundToInt(damage));
                 } else {
-                    currentHealth -= ns.Attack();
+                    //Debug.Log(gameObject.name + " attacking main nest from " + gameObject.transform.position);
+                    currentHealth -= ns.Attack(Mathf.RoundToInt(damage));
                 }
 
                 UpdateHealthBar();
@@ -84,12 +101,15 @@ public class BugAI : MonoBehaviour {
                     healthBar.enabled = false;
                     sr.color = Color.white;
                     dead = true;
+                    ns.newNest -= UpdateTargets;
 
-                    /* change to item */
-                    Item item = gameObject.AddComponent<Item>();
-                    item.SetItem("food_bug", 10);
-                    gameObject.tag = "Item";
-                    gameObject.layer = 8;
+                    if (currentTarget.transform.parent.CompareTag("Offsite")) {
+                        StartCoroutine(Dead(6, 5.0f));
+                    } else {
+                        StartCoroutine(Dead(9, 5.0f));
+                    }
+
+                    
                 }
             }
         } else {
@@ -108,7 +128,7 @@ public class BugAI : MonoBehaviour {
 
 
     void UpdateHealthBar() {
-        healthBar.SetPosition(1, new Vector3(-0.5f + (currentHealth/maxHealthBase), 0.5f, -4.0f));
+        healthBar.SetPosition(1, new Vector3(-0.5f + (currentHealth/healthBase), 0.5f, -4.0f));
     }
 
     void UpdateTargets() {
