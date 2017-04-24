@@ -74,7 +74,7 @@ MonoBehaviour:
   - {fileID: 21300006, guid: 83607c8824a5c2a4b968397b5877e58d, type: 3}
   - {fileID: 21300020, guid: 83607c8824a5c2a4b968397b5877e58d, type: 3}
   - {fileID: 21300018, guid: 83607c8824a5c2a4b968397b5877e58d, type: 3}
-  capacity: 7
+  capacity: 5
 --- !u!212 &212876359384332250
 SpriteRenderer:
   m_ObjectHideFlags: 1

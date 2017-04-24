@@ -53,6 +53,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4063292470596030}
   - component: {fileID: 114747124099458842}
+  - component: {fileID: 61759675734720380}
   m_Layer: 0
   m_Name: Bug
   m_TagString: Untagged
@@ -80,7 +81,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1886243723696016}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 7.8761053, y: -1.1522403, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4455447555161628}
@@ -101,6 +102,31 @@ Transform:
   m_Father: {fileID: 4063292470596030}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
+--- !u!61 &61759675734720380
+BoxCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1886243723696016}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -0.08304429, y: -0.010380745}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.640141, y: 0.39792824}
+  m_EdgeRadius: 0
 --- !u!95 &95535591423079178
 Animator:
   serializedVersion: 3
@@ -131,8 +157,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 0.2
   rotateSpeed: 30
-  maxHealth: 50
-  damage: 1
+  maxHealthBase: 100
   attackDelay: 0.5
   colors:
   - {r: 0.28465617, g: 0.8602941, b: 0.3600845, a: 1}
@@ -141,6 +166,14 @@ MonoBehaviour:
   - {r: 0.7058823, g: 0.2439446, b: 0.5593364, a: 1}
   - {r: 0.47559583, g: 0.33915442, b: 0.9044118, a: 1}
   healthBar: {fileID: 120998665254295500}
+  itemPrefab: {fileID: 1539965066303218, guid: 18162538ef1cce640ba80963b9dc294b, type: 2}
+  bugParts:
+  - {fileID: 21300028, guid: 83607c8824a5c2a4b968397b5877e58d, type: 3}
+  - {fileID: 21300030, guid: 83607c8824a5c2a4b968397b5877e58d, type: 3}
+  - {fileID: 21300032, guid: 83607c8824a5c2a4b968397b5877e58d, type: 3}
+  - {fileID: 21300034, guid: 83607c8824a5c2a4b968397b5877e58d, type: 3}
+  - {fileID: 21300036, guid: 83607c8824a5c2a4b968397b5877e58d, type: 3}
+  - {fileID: 21300038, guid: 83607c8824a5c2a4b968397b5877e58d, type: 3}
 --- !u!120 &120998665254295500
 LineRenderer:
   m_ObjectHideFlags: 1

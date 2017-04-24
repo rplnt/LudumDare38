@@ -6,8 +6,9 @@ public class Item : MonoBehaviour {
 
     public Sprite[] sprites;
 
-    string itemType = "";
+    public string itemType = "";
     public int capacity;
+    public SpriteRenderer sr;
 
     void Start() {
         Sprite sprite = sprites[Random.Range(0, sprites.Length)];
@@ -29,7 +30,7 @@ public class Item : MonoBehaviour {
                 break;
         }
 
-        SpriteRenderer sr = this.GetComponent<SpriteRenderer>();
+        sr = this.GetComponent<SpriteRenderer>();
         sr.sprite = sprite;
     }
 

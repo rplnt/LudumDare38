@@ -8,7 +8,7 @@ public class GroundFloor : MonoBehaviour {
     public int width;
     public int height;
     Texture2D dirt;
-    Bounds bounds;
+    public Bounds bounds;
     float worldSizeX;
     float worldSizeY;
 

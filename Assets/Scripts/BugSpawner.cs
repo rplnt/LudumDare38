@@ -13,7 +13,6 @@ public class BugSpawner : MonoBehaviour {
     float lastSpawn;
 
     public System.Action<int> BugSpawned;
-    
 
 	// Use this for initialization
 	void Start () {
@@ -31,7 +30,7 @@ public class BugSpawner : MonoBehaviour {
     void Spawn() {
         Instantiate(bugPrefab, transform.position + new Vector3(0.0f, Random.RandomRange(-3.0f, +3.0f), 0.0f), Quaternion.identity, ground.transform);
         lastSpawn = Time.time;
-        spawnDelay -= 1.0f;
+        spawnDelay = Mathf.Max(5.0f, spawnDelay - 0.25f);
         spawned++;
 
         if (BugSpawned != null) {

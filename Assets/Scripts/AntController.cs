@@ -33,11 +33,11 @@ public class AntController : MonoBehaviour {
 
     List<Ant> ants;
     Dictionary<GameObject, Node> paths;
+    GroundFloor ground;
 
     public Action<Vector2> dig;
     Nest nest;
 
-    Dictionary<GameObject, Item> itemCache;
 
 	// Use this for initialization
 	void Start () {
@@ -45,8 +45,7 @@ public class AntController : MonoBehaviour {
         paths = new Dictionary<GameObject, Node>();
         ProcessSprites();
         nest = FindObjectOfType<Nest>();
-
-        itemCache = new Dictionary<GameObject, Item>();
+        ground = FindObjectOfType<GroundFloor>();
 	}
 
     void ProcessSprites() {
@@ -112,12 +111,17 @@ public class AntController : MonoBehaviour {
                 if (!ant.homing && ant.NextTarget.next == null) {
                     // reached end
                     if (ant.NextTarget.go.CompareTag("Head")) {
-                        if (dig != null) {
-                            dig(ant.NextTarget.go.transform.position);
-                        }
-                        // move head
-                        if (AntDig(ant)) {
-                            ant.NextTarget.go.transform.Translate((ant.NextTarget.go.transform.position - ant.NextTarget.prev.go.transform.position).normalized * Level.digSpeed, Space.World);
+                        if (ground.bounds.Contains(ant.NextTargetPosition)) {
+                            // move head
+                            if (AntDig(ant)) {
+                                ant.NextTarget.go.transform.Translate((ant.NextTarget.go.transform.position - ant.NextTarget.prev.go.transform.position).normalized * Level.digSpeed, Space.World);
+                                if (dig != null) {
+                                    dig(ant.NextTarget.go.transform.position);
+                                }
+                            }
+                            if (ant.remove) {
+                                ants.RemoveAt(i);
+                            }
                         }
                     }
                     ant.homing = true;
@@ -168,24 +172,28 @@ public class AntController : MonoBehaviour {
     bool AntDig(Ant ant) {
         string key = "";
 
+        bool rt = true;
+
         /* check if we are near something */
         RaycastHit2D hit = Physics2D.Raycast(ant.go.transform.position, Vector3.forward, Mathf.Infinity, 1 << LayerMask.NameToLayer("AntsCare"));
         if (hit.collider != null) {
 
-            /* pick up generic item */
+            /* pick up item */
             if (hit.transform.CompareTag("Item")) {
-                if (!itemCache.ContainsKey(hit.transform.gameObject)) {
-                    Item itemObject = hit.transform.GetComponent<Item>();
-                    if (itemObject == null) {
-                        Debug.LogError("Found Item object without Item script");
-                    } else {
-                        itemCache[hit.collider.transform.gameObject] = itemObject;
-                    }
+                Item itemObject = hit.transform.GetComponent<Item>();
+                if (itemObject == null) {
+                    Debug.LogError("Found Item object without Item script");
                 }
 
-                key = itemCache[hit.transform.gameObject].DigItem();
+                key = itemObject.DigItem();
+                rt = false;
+
             } else if (hit.transform.CompareTag("Offsite")) {
-                return !nest.NestAntOffsite(ant, hit.transform.parent);
+                rt = !nest.NestAntOffsite(ant, hit.transform);
+                if (!rt) {
+                    ant.remove = true;
+                }
+                return rt;
             }
         } else {
             /* random dig from the ground */
@@ -200,7 +208,7 @@ public class AntController : MonoBehaviour {
         sr.enabled = true;
         ant.carrying = key;
 
-        return true;
+        return rt;
     }
 
 }

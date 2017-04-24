@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour {
 
@@ -20,8 +21,16 @@ public class UIManager : MonoBehaviour {
     public Button button;
     public Text buttonText;
 
+    [Header("Game Over")]
+    public GameObject gameOverDialog;
+    public Text totalAnts;
+    public Text totalBugs;
+    public Text totalNests;
+
     [Header("etc")]
     public GameObject buildDialog;
+    public GameObject startDialog;
+    public GameObject pauseDialog;
 
     Nest nest;
 
@@ -35,17 +44,52 @@ public class UIManager : MonoBehaviour {
         nest.leveledUp += LevelUp;
         nest.build += SetupBuildDialog;
 
+        nest.GameOver += GameOver;
+
         UpdateLevelCost();
+
+        startDialog.SetActive(true);
+
+        Time.timeScale = 0.0f;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
+
+    void GameOver() {
+        totalAnts.text = nest.totalAnts.ToString();
+        totalBugs.text = nest.killedBugs.ToString();
+        totalNests.text = nest.totalNests.ToString();
+        gameObject.SetActive(true);
+    }
+
+    public void ResetGame() {
+        SceneManager.LoadScene(0);
+    }
+
+    public void StartGame() {
+        startDialog.SetActive(false);
+        Time.timeScale = 1.0f;
+    }
+
+    // MOVE
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            PauseGame();
+        }
+    }
+
+    public void PauseGame() {
+        pauseDialog.SetActive(true);
+        Time.timeScale = 0.0f;
+    }
+
+    public void UnpuseGame() {
+        pauseDialog.SetActive(false);
+        Time.timeScale = 1.0f;
+    }
 
     void SetupBuildDialog(bool canBuild) {
         // position
-        buildDialog.transform.position = new Vector2(Mathf.Clamp(Input.mousePosition.x, 100, Screen.width - 100), Mathf.Clamp(Input.mousePosition.y, 100, Screen.width - 100));
+        buildDialog.transform.position = new Vector2(Mathf.Clamp(Input.mousePosition.x, 250, Screen.width - 250), Mathf.Clamp(Input.mousePosition.y, 250, Screen.width - 250));
         Transform button = buildDialog.transform.FindChild("Yes");
         Button buttonScript = button.GetComponent<Button>();
         if (canBuild) {

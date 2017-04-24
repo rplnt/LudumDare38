@@ -23,6 +23,9 @@ public class BugAI : MonoBehaviour {
     Transform graphics;
     SpriteRenderer sr;
 
+    public GameObject itemPrefab;
+    public Sprite[] bugParts;
+
     Nest ns;
 
     
@@ -34,17 +37,17 @@ public class BugAI : MonoBehaviour {
         sr = graphics.GetComponent<SpriteRenderer>();
         sr.color = colors[Random.Range(0, colors.Length)];
         ns = FindObjectOfType<Nest>();
+        ns.newNest += UpdateTargets;
 	}
 	
 	// Update is called once per frame
 	void Update () {
         if (dead) {
             Color c = sr.color;
-            c.a -= 0.1f * Time.deltaTime;
+            c.a -= 0.01f * Time.deltaTime;
             if (c.a < 0.1f) {
                 Destroy(gameObject);
             }
-            Debug.Log(c);
             sr.color = c;
 
             return;
@@ -52,6 +55,7 @@ public class BugAI : MonoBehaviour {
 
         if (currentTarget == null) {
             Debug.LogError("BugAI: No target!");
+            UpdateTargets();
             return;
         }
 
@@ -61,10 +65,18 @@ public class BugAI : MonoBehaviour {
             // ATTACK
             if (Time.time > lastAttack + attackDelay) {
                 lastAttack = Time.time;
-                currentHealth -= ns.Attack(currentTarget.transform.parent);
+                if (currentTarget.transform.parent.CompareTag("Offsite")) {
+                    OffsiteManager om = currentTarget.transform.parent.GetComponent<OffsiteManager>();
+                    currentHealth -= om.Attack();
+                } else {
+                    currentHealth -= ns.Attack();
+                }
+
                 UpdateHealthBar();
+
                 if (currentHealth < 0.0f) {
                     /* DEATH */
+                    ns.killedBugs++;
                     Animator anim = gameObject.GetComponentInChildren<Animator>();
                     if (anim != null) {
                         anim.enabled = false;
@@ -72,6 +84,13 @@ public class BugAI : MonoBehaviour {
                     healthBar.enabled = false;
                     sr.color = Color.white;
                     dead = true;
+
+                    /* change to item */
+                    Item item = gameObject.AddComponent<Item>();
+                    item.itemType = "food_bug";
+                    item.capacity = 10;
+                    gameObject.tag = "Item";
+                    gameObject.layer = 8;
                 }
             }
         } else {

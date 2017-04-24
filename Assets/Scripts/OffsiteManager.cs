@@ -5,6 +5,7 @@ using UnityEngine;
 public class OffsiteManager : MonoBehaviour {
 
     public LineRenderer healthBar;
+    public System.Action NestDestroyed;
 
     public int antCount;
 
@@ -13,9 +14,7 @@ public class OffsiteManager : MonoBehaviour {
     }
 
     public bool NestAnt() {
-        Debug.Log("NEST");
         if (antCount >= Level.limits[0]) {
-            Debug.Log("FULL");
             return false;
         }
 
@@ -29,5 +28,20 @@ public class OffsiteManager : MonoBehaviour {
 
         float ratio = (float)antCount / Level.limits[0];
         healthBar.SetPosition(1, new Vector3(-0.5f + ratio, 0.35f, -4.0f));
+    }
+
+
+    public float Attack() {
+        antCount--;
+        if (antCount <= 0) {
+            if (NestDestroyed != null) {
+                NestDestroyed();
+            }
+
+            Destroy(gameObject);
+            return -1.0f;
+        }
+        UpdateHealthBar();
+        return Mathf.Max(0.5f * antCount, 0.0f);
     }
 }

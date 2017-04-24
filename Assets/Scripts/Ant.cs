@@ -6,6 +6,7 @@ public class Ant {
     public GameObject go;
     public Node NextTarget;
     public bool homing = false;
+    public bool remove = false;
     public float speed {
         get {
             return 1.0f * ((carrying == null)?1.0f:0.7f);

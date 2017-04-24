@@ -20,10 +20,15 @@ public class Nest : MonoBehaviour {
     private float lastRelease;
     private float lastBirth;
 
+    [Header("Stats")]
+    public int totalAnts;
+    public int totalNests;
+    public int killedBugs;
+
     Transform[] slots = new Transform[Level.maxLevel + 1];
     List<Transform> spawners = new List<Transform>();
 
-    Consumables items = new Consumables(10, 100, 50, 50);
+    Consumables items = new Consumables(20, 10, 5, 5);
 
     int[] levelMultipliers = { 1, 2, 4, 5, 8 };
 
@@ -33,6 +38,8 @@ public class Nest : MonoBehaviour {
     public System.Action<bool> enoughResourcesToUpgrade;
     public System.Action leveledUp;
     public System.Action<bool> build;
+    public System.Action newNest;
+    public System.Action GameOver;
 
     public int currentLevel = 0;
 
@@ -40,6 +47,9 @@ public class Nest : MonoBehaviour {
     public LineRenderer nestedAntsBar;
     public GameObject offsitePrefab;
     Head offsite;
+
+    float lastAttack = 0.0f;
+    float attackBLockade = 1.0f;
 
     //float feromones;
 
@@ -90,27 +100,35 @@ public class Nest : MonoBehaviour {
         nestedAntsBar.SetPosition(1, new Vector3(-0.4f + 1.5f * ratio, 0.4f, -5.0f));
     }
 
-    public float Attack(Transform attacked) {
-        if (attacked == transform) {
-            nestedCount -= 1;
-            antCount -= 1;
-            if (nestedCount <= 0) {
-                nestedAntsBar.enabled = false;
-                //GAME OVER
+    public void Turn() {
+        //items.dirt -= 2;
+    }
+
+    public float Attack() {
+        nestedCount -= 1;
+        if (nestedCount <= 0) {
+            Debug.Log("GAME OVER");
+            /* GAME OVER*/
+            nestedAntsBar.enabled = false;
+            if (GameOver != null) {
+                Time.timeScale = 0.0f;
+                GameOver();
             }
 
-            if (antCountChanged != null) {
-                antCountChanged(antCount);
-            }
-            if (antNestedCountChanged != null) {
-                antNestedCountChanged(nestedCount);
-            }
-
-            return 0.75f * nestedCount;
-        } else {
-            // offsite
+            return 0.0f;
         }
-        return 0.0f;
+
+        antCount -= 1;
+        lastAttack = Time.time;
+
+        if (antCountChanged != null) {
+            antCountChanged(antCount);
+        }
+        if (antNestedCountChanged != null) {
+            antNestedCountChanged(nestedCount);
+        }
+
+        return Mathf.Max(0.75f * nestedCount, 0.0f);
     }
 
 
@@ -131,10 +149,11 @@ public class Nest : MonoBehaviour {
             if (antNestedCountChanged != null) {
                 antNestedCountChanged(nestedCount);
             }
+            totalAnts++;
         }
 
         // release ant
-        if (nestedCount > toNest && lastRelease + Level.releaseDelay[currentLevel] < Time.time && spawners.Count > 0) {
+        if (nestedCount > toNest && lastRelease + Level.releaseDelay[currentLevel] < Time.time && spawners.Count > 0 && Time.time > lastAttack + attackBLockade) {
             Transform spawner = spawners[Random.Range(0, spawners.Count)];
             GameObject larva = antPrefab.Spawn(ground.transform, spawner.position, Random.rotation);
             larva.transform.Find("Item").GetComponent<SpriteRenderer>().enabled = false;
@@ -213,13 +232,13 @@ public class Nest : MonoBehaviour {
         return true;
     }
 
-    public void KillFreeAnt(Ant ant) {
-        ant.go.Recycle();
-        antCount--;
-        if (antCountChanged != null) {
-            antCountChanged(antCount);
-        }
-    }
+    //public void KillFreeAnt(Ant ant) {
+    //    ant.go.Recycle();
+    //    antCount--;
+    //    if (antCountChanged != null) {
+    //        antCountChanged(antCount);
+    //    }
+    //}
 
     public void CreateSpawner(GameObject slot) {
         slot.SetActive(false);
@@ -244,7 +263,15 @@ public class Nest : MonoBehaviour {
 
     public void BuildFortress(bool build) {
         if (build) {
-            Instantiate(offsitePrefab, offsite.transform.position, Quaternion.identity, transform);
+            if (items.Consume(Level.costs[0])) {
+                Instantiate(offsitePrefab, offsite.transform.position, Quaternion.identity, transform);
+                totalNests++;
+            } else {
+                return;
+            }
+            if (newNest != null) {
+                newNest();
+            }
         }
 
         offsite.SpawnNewHead();

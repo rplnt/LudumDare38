@@ -20,10 +20,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4486252357704146}
   - component: {fileID: 212625962485736098}
-  - component: {fileID: 58999799099579738}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Nest
-  m_TagString: Offsite
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -53,9 +52,9 @@ GameObject:
   - component: {fileID: 4116810062820216}
   - component: {fileID: 114044437556945152}
   - component: {fileID: 58270296126825768}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Offsite
-  m_TagString: Untagged
+  m_TagString: Offsite
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -146,21 +145,6 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.3
---- !u!58 &58999799099579738
-CircleCollider2D:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1039956570492848}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  serializedVersion: 2
-  m_Radius: 1.25
 --- !u!114 &114044437556945152
 MonoBehaviour:
   m_ObjectHideFlags: 1
