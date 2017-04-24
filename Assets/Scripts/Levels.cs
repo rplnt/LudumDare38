@@ -71,7 +71,7 @@ public static class Level {
     };
 
     public static readonly float[] offsiteLevelsModifier = {
-        1.0f, 1.2f, 2.0f, 2.5f, 3.2f, 4.2f, 5.5f
+        1.0f, 1.2f, 1.5f, 2.0f, 2.7f, 3.5f, 4.5f
     };
 
     public static readonly float[] releaseDelay = {
@@ -81,7 +81,7 @@ public static class Level {
     public static float singleReleaseDelay = 0.23f;
 
     public static readonly float[] birthDelay = {
-        2.4f, 2.1f, 1.7f, 1.3f, 0.8f, 0.4f, 0.25f
+        2.2f, 1.8f, 1.4f, 1.1f, 0.8f, 0.6f, 0.4f
     };
 
 

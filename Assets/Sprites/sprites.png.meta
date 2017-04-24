@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 7976efe54bf8cc44e82bafad507c20cf
-timeCreated: 1493061423
+timeCreated: 1493063237
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -162,12 +162,12 @@ TextureImporter:
       name: orb
       rect:
         serializedVersion: 2
-        x: 7
-        y: 178
-        width: 22
-        height: 22
+        x: 12
+        y: 183
+        width: 12
+        height: 12
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0

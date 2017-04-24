@@ -17,6 +17,7 @@ public class OffsiteManager : MonoBehaviour {
         nest = FindObjectOfType<Nest>();
         offsiteLevel = nest.currentLevel;
 
+        /* light up orbs */
         for (int i = 1; i <= offsiteLevel; i++) {
             Transform orb = transform.FindChild("Orbs/Orb " + i);
             if (orb != null) {
@@ -24,15 +25,6 @@ public class OffsiteManager : MonoBehaviour {
             }
         }
 
-        //if (offsiteLevel > 0) {
-
-        //    Transform orbs = transform.FindChild("Orbs");
-        //    if (orbs != null) {
-        //        foreach (Transform orb in orbs) {
-                    
-        //        }
-        //    }
-        //}
     }
 
     public bool NestAnt() {
