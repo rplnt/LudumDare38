@@ -11,6 +11,10 @@ public class Item : MonoBehaviour {
     public SpriteRenderer sr;
 
     void Start() {
+        if (sprites == null) {
+            Debug.LogError("Item is missing sprite list?");
+            return;
+        }
         Sprite sprite = sprites[Random.Range(0, sprites.Length)];
         switch (sprite.name) {
             case "stones":
@@ -40,5 +44,11 @@ public class Item : MonoBehaviour {
             Destroy(gameObject);
         }
         return itemType;
+    }
+
+
+    public void SetItem(string type, int count) {
+        itemType = type;
+        capacity = count;
     }
 }

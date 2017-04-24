@@ -59,7 +59,7 @@ public static class Level {
     public static int maxLevel = 6;
 
     public static readonly Consumables[] costs = {
-        new Consumables(0, 15, 8, 25),
+        new Consumables(0, 15, 5, 10),
         new Consumables(0, 50, 15, 10),
         new Consumables(0, 90, 30, 20),
         new Consumables(0, 150, 50, 30),

@@ -78,7 +78,7 @@ public class Head : MonoBehaviour {
                     nest.OpenSpawner(transform.parent);
                 }
 
-                //nest.Turn();
+                nest.Turn();
 
                 Time.timeScale = 1.0f;
             }

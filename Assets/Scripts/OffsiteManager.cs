@@ -6,11 +6,13 @@ public class OffsiteManager : MonoBehaviour {
 
     public LineRenderer healthBar;
     public System.Action NestDestroyed;
+    Nest nest;
 
     public int antCount;
 
     void Start() {
         UpdateHealthBar();
+        nest = FindObjectOfType<Nest>();
     }
 
     public bool NestAnt() {
@@ -33,6 +35,7 @@ public class OffsiteManager : MonoBehaviour {
 
     public float Attack() {
         antCount--;
+        nest.KilledOffsiteAnt();
         if (antCount <= 0) {
             if (NestDestroyed != null) {
                 NestDestroyed();

@@ -44,7 +44,7 @@ public class BugAI : MonoBehaviour {
 	void Update () {
         if (dead) {
             Color c = sr.color;
-            c.a -= 0.01f * Time.deltaTime;
+            c.a -= 0.025f * Time.deltaTime;
             if (c.a < 0.1f) {
                 Destroy(gameObject);
             }
@@ -54,7 +54,7 @@ public class BugAI : MonoBehaviour {
         }
 
         if (currentTarget == null) {
-            Debug.LogError("BugAI: No target!");
+            //Debug.LogError("BugAI: No target!");
             UpdateTargets();
             return;
         }
@@ -87,8 +87,7 @@ public class BugAI : MonoBehaviour {
 
                     /* change to item */
                     Item item = gameObject.AddComponent<Item>();
-                    item.itemType = "food_bug";
-                    item.capacity = 10;
+                    item.SetItem("food_bug", 10);
                     gameObject.tag = "Item";
                     gameObject.layer = 8;
                 }

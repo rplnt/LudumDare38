@@ -58,7 +58,7 @@ public class UIManager : MonoBehaviour {
         totalAnts.text = nest.totalAnts.ToString();
         totalBugs.text = nest.killedBugs.ToString();
         totalNests.text = nest.totalNests.ToString();
-        gameObject.SetActive(true);
+        gameOverDialog.SetActive(true);
     }
 
     public void ResetGame() {

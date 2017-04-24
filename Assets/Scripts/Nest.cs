@@ -8,8 +8,6 @@ public class Nest : MonoBehaviour {
     [Header("Ants")]
     public int antCount;
     public int nestedCount;
-    public int minNested;
-    public int toNest;
 
     [Header("Ant Properties")]
     public GameObject antPrefab;
@@ -111,8 +109,8 @@ public class Nest : MonoBehaviour {
             /* GAME OVER*/
             nestedAntsBar.enabled = false;
             if (GameOver != null) {
-                Time.timeScale = 0.0f;
                 GameOver();
+                Time.timeScale = 0.0f;
             }
 
             return 0.0f;
@@ -153,9 +151,9 @@ public class Nest : MonoBehaviour {
         }
 
         // release ant
-        if (nestedCount > toNest && lastRelease + Level.releaseDelay[currentLevel] < Time.time && spawners.Count > 0 && Time.time > lastAttack + attackBLockade) {
+        if (nestedCount > Level.limits[currentLevel] / 2 && lastRelease + Level.releaseDelay[currentLevel] < Time.time && spawners.Count > 0 && Time.time > lastAttack + attackBLockade) {
             Transform spawner = spawners[Random.Range(0, spawners.Count)];
-            GameObject larva = antPrefab.Spawn(ground.transform, spawner.position, Random.rotation);
+            GameObject larva = antPrefab.Spawn(ground.transform, spawner.position, Quaternion.identity);
             larva.transform.Find("Item").GetComponent<SpriteRenderer>().enabled = false;
             antControl.AddAnt(larva, spawner);
             nestedCount--;
@@ -239,6 +237,14 @@ public class Nest : MonoBehaviour {
     //        antCountChanged(antCount);
     //    }
     //}
+
+    public void KilledOffsiteAnt() {
+        antCount--;
+
+        if (antCountChanged != null) {
+            antCountChanged(antCount);
+        }
+    }
 
     public void CreateSpawner(GameObject slot) {
         slot.SetActive(false);
