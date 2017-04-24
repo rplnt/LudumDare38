@@ -6,6 +6,7 @@ public class OffsiteManager : MonoBehaviour {
 
     public LineRenderer healthBar;
     public System.Action NestDestroyed;
+    int offsiteLevel;
     Nest nest;
 
     public int nestedAntCount;
@@ -14,6 +15,24 @@ public class OffsiteManager : MonoBehaviour {
         //Debug.Log("OffsiteManager:Start");
         UpdateHealthBar();
         nest = FindObjectOfType<Nest>();
+        offsiteLevel = nest.currentLevel;
+
+        for (int i = 1; i <= offsiteLevel; i++) {
+            Transform orb = transform.FindChild("Orbs/Orb " + i);
+            if (orb != null) {
+                orb.gameObject.SetActive(true);
+            }
+        }
+
+        //if (offsiteLevel > 0) {
+
+        //    Transform orbs = transform.FindChild("Orbs");
+        //    if (orbs != null) {
+        //        foreach (Transform orb in orbs) {
+                    
+        //        }
+        //    }
+        //}
     }
 
     public bool NestAnt() {
@@ -35,8 +54,8 @@ public class OffsiteManager : MonoBehaviour {
 
 
     public float AttackOffsite(int damage) {
-        damage = Mathf.Min(damage * 2, nestedAntCount);
-
+        damage = Mathf.Min(damage, nestedAntCount);
+        float returnDamage = Mathf.Max(nestedAntCount * 0.75f, 0.0f);
         nestedAntCount = nestedAntCount - damage;
         nest.KilledOffsiteAnts(damage);
         
@@ -46,10 +65,10 @@ public class OffsiteManager : MonoBehaviour {
             }
 
             Destroy(gameObject);
-            return 1f;
+            return (float)Level.offsiteLevelsModifier[offsiteLevel] * damage;
         }
         UpdateHealthBar();
-        //Debug.Log(nestedAntCount * 0.75f);
-        return Mathf.Max(nestedAntCount * 0.75f, 0.0f);
+
+        return (float)Level.offsiteLevelsModifier[offsiteLevel] * returnDamage;
     }
 }

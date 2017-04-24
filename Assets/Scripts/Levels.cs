@@ -47,14 +47,12 @@ public struct Consumables {
             case "stone": stones += 1; break;
         }
     }
-
-
 }
 
 
 public static class Level {
 
-    public static float digSpeed = 0.05f;
+    public static float digSpeed = 0.045f;
 
     public static int maxLevel = 6;
 
@@ -63,21 +61,27 @@ public static class Level {
         new Consumables(0, 40, 12, 10),
         new Consumables(0, 60, 25, 15),
         new Consumables(0, 100, 45, 25),
-        new Consumables(0, 160, 75, 40),
-        new Consumables(0, 280, 110, 60),
-        new Consumables(0, 400, 160, 90)
+        new Consumables(0, 160, 80, 40),
+        new Consumables(0, 280, 120, 60),
+        new Consumables(0, 400, 190, 90)
     };
 
     public static readonly int[] limits = {
-        20, 50, 80, 120, 170, 200, 250
+        20, 50, 90, 140, 200, 280, 400
+    };
+
+    public static readonly float[] offsiteLevelsModifier = {
+        1.0f, 1.2f, 2.0f, 2.5f, 3.2f, 4.2f, 5.5f
     };
 
     public static readonly float[] releaseDelay = {
-        0.6f, 0.4f, 0.3f, 0.2f, 0.1f, 0.05f, 0.02f
+        0.7f, 0.4f, 0.3f, 0.25f, 0.12f, 0.07f, 0.04f
     };
 
+    public static float singleReleaseDelay = 0.23f;
+
     public static readonly float[] birthDelay = {
-        2.5f, 2.0f, 1.5f, 1.0f, 0.5f, 0.3f, 0.1f
+        2.4f, 2.1f, 1.7f, 1.3f, 0.8f, 0.4f, 0.25f
     };
 
 

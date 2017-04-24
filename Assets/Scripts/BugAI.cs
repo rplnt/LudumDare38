@@ -6,7 +6,7 @@ public class BugAI : MonoBehaviour {
 
     public float speed;
     public float rotateSpeed;
-    public float healthBase;
+    public float health;
     public float currentHealth;
     public float attackDelay;
     public float damage;
@@ -38,8 +38,8 @@ public class BugAI : MonoBehaviour {
         sr.color = colors[Random.Range(0, colors.Length)];
         ns = FindObjectOfType<Nest>();
         ns.newNest += UpdateTargets;
-
-        currentHealth = healthBase + Random.Range(0.0f, 2.0f * ns.killedBugs);
+        currentHealth = health;
+        //currentHealth = health + Random.Range(0.0f, 2.0f * ns.killedBugs);
 	}
 
     IEnumerator Dead(int feedNest, float delay) {
@@ -128,7 +128,7 @@ public class BugAI : MonoBehaviour {
 
 
     void UpdateHealthBar() {
-        healthBar.SetPosition(1, new Vector3(-0.5f + (currentHealth/healthBase), 0.5f, -4.0f));
+        healthBar.SetPosition(1, new Vector3(-0.5f + (currentHealth/health), 0.5f, -4.0f));
     }
 
     void UpdateTargets() {

@@ -157,7 +157,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 0.21
   rotateSpeed: 30
-  healthBase: 90
+  health: 80
   currentHealth: 0
   attackDelay: 0.55
   damage: 1

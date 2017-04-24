@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 7976efe54bf8cc44e82bafad507c20cf
-timeCreated: 1493039097
+timeCreated: 1493061423
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -11,6 +11,7 @@ TextureImporter:
     21300008: nest_closed
     21300010: nest_opened
     21300012: offsite_nest
+    21300014: orb
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -152,6 +153,19 @@ TextureImporter:
         y: 0
         width: 128
         height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: orb
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 178
+        width: 22
+        height: 22
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

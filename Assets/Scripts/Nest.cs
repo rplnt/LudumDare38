@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class Nest : MonoBehaviour {
 
+    public int cheat;
+
     [Header("Ants")]
     public int antCount;
     public int nestedCount;
@@ -25,9 +27,11 @@ public class Nest : MonoBehaviour {
     public int killedBugs;
 
     Transform[] slots = new Transform[Level.maxLevel + 1];
-    List<Transform> spawners = new List<Transform>();
+    //List<Transform> spawners = new List<Transform>();
+    Dictionary<Transform, float> spawners = new Dictionary<Transform, float>();
+    int openedSpawners = 0;
 
-    Consumables items = new Consumables(20, 15, 5, 5);
+    Consumables items;
 
     public System.Action<Consumables> resourcesUpdated;
     public System.Action<int> antCountChanged;
@@ -48,12 +52,11 @@ public class Nest : MonoBehaviour {
     float lastAttack = 0.0f;
     float attackBLockade = 1.0f;
 
-    //float feromones;
-
     GameObject ground;
     AntController antControl;
 
     void Start() {
+        items = new Consumables(20 + cheat, 15 + cheat, 5 + cheat, 5 + cheat);
         antCount = Level.limits[0];
         nestedCount = antCount;
         lastBirth = Time.time;
@@ -109,6 +112,12 @@ public class Nest : MonoBehaviour {
             damage *= 2;
         }
 
+        lastAttack = Time.time;
+        float effectivity = 1.0f - (float)nestedCount / Level.limits[currentLevel];
+        float attack = 0.3f * nestedCount + effectivity * 0.6f * nestedCount;
+
+        int lostInCombat = Mathf.CeilToInt(attack * 0.05f);
+        damage += lostInCombat;
         damage = Mathf.Min(damage, nestedCount);
 
         antCount -= damage;
@@ -121,11 +130,8 @@ public class Nest : MonoBehaviour {
                 GameOver();
                 Time.timeScale = 0.0f;
             }
-
             return 0.0f;
         }
-
-        lastAttack = Time.time;
 
         if (antCountChanged != null) {
             antCountChanged(antCount);
@@ -134,8 +140,6 @@ public class Nest : MonoBehaviour {
             antNestedCountChanged(nestedCount);
         }
 
-        float effectivity = 1.0f - (float)nestedCount/Level.limits[currentLevel];
-        float attack = 0.4f * nestedCount + effectivity * 0.6f * nestedCount;
         return Mathf.Max(attack, 0.0f);
     }
 
@@ -161,8 +165,18 @@ public class Nest : MonoBehaviour {
         }
 
         // release ant
-        if (lastRelease + Level.releaseDelay[currentLevel] < Time.time && spawners.Count > 0 && Time.time > lastAttack + attackBLockade) {
-            ReleaseAnt(spawners[Random.Range(0, spawners.Count)]);
+        if (lastRelease + Level.releaseDelay[currentLevel] < Time.time && openedSpawners > 0 && Time.time > lastAttack + attackBLockade) {
+            Transform leastRecentSpawner = null;
+            float leastRecentTime = Mathf.Infinity;
+            foreach(KeyValuePair<Transform, float> spawnerData in spawners) {
+                if (spawnerData.Value < leastRecentTime) {
+                    leastRecentTime = spawnerData.Value;
+                    leastRecentSpawner = spawnerData.Key;
+                }
+            }
+            if (leastRecentTime < Time.time - Level.singleReleaseDelay) {
+                ReleaseAnt(leastRecentSpawner);
+            }
         }
 
         if (currentLevel < Level.maxLevel && items.IsEnough(Level.costs[currentLevel + 1])) {
@@ -180,7 +194,10 @@ public class Nest : MonoBehaviour {
             Debug.LogError("Failed release");
             return;
         }
-        if (nestedCount < 1) return;
+        /* update release time */
+        spawners[spawner] = Time.time;
+
+        if (nestedCount <= 1) return;
         GameObject larva = antPrefab.Spawn(ground.transform, spawner.position, Quaternion.identity);
         larva.transform.Find("Item").GetComponent<SpriteRenderer>().enabled = false;
         antControl.AddAnt(larva, spawner);
@@ -276,11 +293,13 @@ public class Nest : MonoBehaviour {
 
 
     public void OpenSpawner(Transform spawner) {
-        spawners.Add(spawner);
+        openedSpawners++;
+        spawners[spawner] = Time.time;
     }
 
     public void CloseSpawner(Transform spawner) {
-        spawners.Remove(spawner);
+        openedSpawners--;
+        spawners[spawner] = Mathf.Infinity;
     }
 
     

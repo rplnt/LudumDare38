@@ -34,14 +34,21 @@ public class BugSpawner : MonoBehaviour {
         spawnDelay = Mathf.Max(5.0f, spawnDelay - 0.25f);
         spawned++;
 
+        BugAI ai = bug.GetComponent<BugAI>();
+
+
         if (spawned % 10 == 0) {
             /* boss */
-            BugAI ai = bug.GetComponent<BugAI>();
-            ai.healthBase = 3 * ai.healthBase;
-            ai.damage = ai.damage * 2.0f;
+            ai.health = (spawned / 10) * 2 * ai.health;
+            ai.damage = (ai.damage + (spawned / 5)) * 3.0f;
             ai.speed = 0.666f * ai.speed;
-            bug.transform.localScale *= 1.5f;
+            bug.transform.localScale *= 1.6f;
 
+        } else {
+            float healthModifier = Random.Range(0.0f, 1.0f);
+            bug.transform.localScale *= (1.0f + healthModifier/10.0f);
+            ai.health = ai.health + 2.0f * (1.0f + healthModifier) * spawned;
+            ai.damage = ai.damage + (spawned / 5);
         }
 
         if (BugSpawned != null) {
